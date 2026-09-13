@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一对一教师信息查询</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;600;700&display=swap">
+<style>
+  /* ============ 设计令牌 ============ */
+  :root {
+    --paper: #F5F1E8;
+    --paper-deep: #EDE7DA;
+    --card: #FFFFFF;
+    --ink: #262B36;
+    --ink-2: #4C5463;
+    --ink-3: #848B99;
+    --line: #E4DECF;
+    --brand: #2E5C8A;
+    --brand-deep: #22466B;
+    --brand-ink: #1B3855;
+    --gold: #D99A2B;
+    --gold-soft: #F3D9A4;
+    --star-on: #E8A33D;
+    --star-off: #DCD8CC;
+    --radius: 16px;
+    --shadow: 0 1px 2px rgba(38,43,54,.05), 0 8px 24px rgba(38,43,54,.07);
+    --shadow-lift: 0 2px 4px rgba(38,43,54,.07), 0 16px 40px rgba(38,43,54,.13);
+    --subj-math: #2E5C8A;
+    --subj-physics: #2F7D6E;
+    --subj-chem: #7B5EA7;
+    --subj-chinese: #B4616E;
+    --subj-english: #3E7C4F;
+    --subj-thinking: #C07A2D;
+    --serif: "Noto Serif SC", "Songti SC", "SimSun", serif;
+    --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--sans);
+    background: var(--paper);
+    color: var(--ink);
+    line-height: 1.55;
+    min-height: 100vh;
+  }
+  button { font-family: inherit; cursor: pointer; }
+  input, select { font-family: inherit; }
+
+  /* ============ Hero ============ */
+  .hero {
+    background:
+      radial-gradient(1100px 420px at 85% -60%, rgba(217,154,43,.22), transparent 60%),
+      radial-gradient(900px 480px at -10% 120%, rgba(61,116,172,.28), transparent 55%),
+      linear-gradient(160deg, var(--brand-ink) 0%, var(--brand) 62%, var(--brand-deep) 100%);
+    color: #F7F3EA;
+    padding: 46px 20px 0;
+  }
+  .hero-inner { max-width: 1180px; margin: 0 auto; }
+
+  .brand-row { display: flex; align-items: center; gap: 12px; margin-bottom: 26px; flex-wrap: wrap; }
+  .brand-logo {
+    display: inline-flex; align-items: center; gap: 9px;
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 5px 16px 5px 9px;
+    box-shadow: 0 4px 18px rgba(20,40,70,.35);
+    border: 1px solid rgba(255,255,255,.65);
+  }
+  .brand-symbol { height: 34px; width: auto; display: block; }
+  .brand-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.02; }
+  .brand-zh {
+    font-size: 26px; font-weight: 900; letter-spacing: .1em;
+    color: #F2661F;
+    font-family: var(--serif);
+  }
+  .brand-en { font-size: 9px; letter-spacing: .22em; color: #F2661F; margin-top: 3px; font-weight: 600; }
+  .brand-name {
+    font-size: 13px; letter-spacing: .14em; color: #D9C9A8;
+    font-weight: 600;
+  }
+
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(28px, 4.6vw, 42px);
+    font-weight: 900;
+    letter-spacing: .02em;
+    line-height: 1.2;
+  }
+  .hero-sub { margin-top: 10px; font-size: 15px; color: #C9D6E2; }
+
+  .search-panel {
+    margin-top: 30px;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lift);
+    padding: 16px 18px 18px;
+    color: var(--ink);
+  }
+  .search-box { display: flex; align-items: center; gap: 10px; }
+  .search-box svg { flex: none; color: var(--ink-3); }
+  .search-box input {
+    flex: 1; border: none; outline: none;
+    font-size: 16px; color: var(--ink); background: transparent;
+    padding: 6px 0;
+  }
+  .search-box input::placeholder { color: var(--ink-3); }
+  .search-divider { height: 1px; background: var(--line); margin: 10px 0 14px; }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .filters label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); }
+  .filters select {
+    appearance: none; -webkit-appearance: none;
+    border: 1px solid var(--line); background: #FBFAF6;
+    border-radius: 10px; padding: 8px 30px 8px 12px;
+    font-size: 14px; color: var(--ink);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%234C5463' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center;
+    cursor: pointer;
+  }
+  .filters select:focus-visible, .search-box input:focus-visible, .btn:focus-visible, .modal-close:focus-visible {
+    outline: 2px solid var(--gold); outline-offset: 2px;
+  }
+  .btn-reset {
+    margin-left: auto;
+    border: 1px solid var(--line); background: #FBFAF6; color: var(--ink-2);
+    border-radius: 10px; padding: 8px 14px; font-size: 14px;
+  }
+  .btn-reset:hover { border-color: var(--brand); color: var(--brand); }
+
+  /* ============ 家长需求匹配 ============ */
+  .match-panel { padding: 14px 0 6px; }
+  .match-inner {
+    background: #FFFFFF;
+    border: 1px solid #E9DFC9;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 14px 18px 16px;
+  }
+  .match-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .match-title {
+    font-family: var(--serif); font-weight: 700; font-size: 16px; color: var(--ink);
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .match-title svg { color: var(--gold); }
+  .match-sub { font-size: 12px; color: var(--ink-3); }
+  .match-input-row { display: flex; gap: 10px; margin-top: 11px; }
+  .match-input-row input {
+    flex: 1; min-width: 0;
+    border: 1px solid var(--line); background: #FBFAF6;
+    border-radius: 10px; padding: 9px 13px; font-size: 14px; color: var(--ink); outline: none;
+  }
+  .match-input-row input:focus { border-color: var(--gold); background: #fff; }
+  .match-btn {
+    flex: none;
+    border: none; background: linear-gradient(140deg, #E9B355, #D99A2B);
+    color: #3A2A08; font-weight: 700; font-size: 14px;
+    border-radius: 10px; padding: 9px 20px;
+    box-shadow: 0 2px 8px rgba(217,154,43,.28);
+  }
+  .match-btn:hover { filter: brightness(1.05); }
+  .match-tags { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 11px; }
+  .match-tag-label { font-size: 12px; color: var(--ink-3); flex: none; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    border: 1px solid var(--line); background: #FBFAF6; color: var(--ink-2);
+    border-radius: 999px; padding: 5px 13px; font-size: 13px;
+    transition: all .15s ease;
+  }
+  .chip:hover { border-color: var(--gold); color: #9A6B14; }
+  .chip.on {
+    background: #FBF3E2; border-color: #E9B355; color: #9A6B14; font-weight: 600;
+    box-shadow: 0 0 0 2px rgba(233,179,85,.22);
+  }
+  .match-status {
+    margin-top: 11px; font-size: 12.5px; color: var(--ink-2);
+    background: #FBF7EE; border: 1px solid #F0E4C8; border-radius: 9px;
+    padding: 8px 12px; line-height: 1.65;
+  }
+  .match-status b { color: #9A6B14; }
+  .match-status .clear-match {
+    margin-left: 8px; border: none; background: transparent; color: var(--brand);
+    font-size: 12.5px; text-decoration: underline; cursor: pointer; padding: 0;
+  }
+  .badge-match { color: #fff; }
+  .badge-match-high { background: #C8860F; }
+  .badge-match-mid { background: var(--brand); }
+  .badge-match-basic { background: #8B93A1; }
+
+  /* ============ 主体 ============ */
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+  .result-bar {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 12px; flex-wrap: wrap;
+    padding: 26px 0 14px; font-size: 14px; color: var(--ink-2);
+  }
+  .result-bar b { color: var(--ink); font-size: 16px; }
+  .result-hint { font-size: 13px; color: var(--ink-3); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 18px;
+    padding-bottom: 40px;
+  }
+
+  /* ============ 教师卡片 ============ */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    display: flex; flex-direction: column;
+    transition: transform .18s ease, box-shadow .18s ease;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+  }
+  .card:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+    .card:hover { transform: none; }
+  }
+
+  .poster {
+    position: relative;
+    height: 138px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 7px; color: #fff;
+    overflow: hidden;
+  }
+  .poster::after {
+    content: "";
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(220px 110px at 15% 0%, rgba(255,255,255,.16), transparent 60%),
+      radial-gradient(260px 140px at 100% 100%, rgba(0,0,0,.16), transparent 60%);
+    pointer-events: none;
+  }
+  .poster-subj { position: absolute; top: 10px; left: 12px; font-size: 12px; opacity: .92; letter-spacing: .08em; }
+  .poster-stage {
+    font-family: var(--serif);
+    font-size: 25px; font-weight: 700; letter-spacing: .06em;
+    max-width: 86%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .poster-note {
+    position: absolute; right: 10px; bottom: 8px;
+    font-size: 11px; opacity: .78; letter-spacing: .1em;
+    border: 1px solid rgba(255,255,255,.45); border-radius: 999px;
+    padding: 1px 9px;
+  }
+  .poster-stars { display: flex; gap: 3px; }
+
+  .card-body { padding: 14px 16px 0; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  .card-name-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .card-name { font-size: 17px; font-weight: 700; }
+  .card-stage { font-size: 13px; color: var(--ink-3); }
+
+  .badge-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 600;
+    border-radius: 999px; padding: 3px 10px;
+  }
+  .badge-subj { color: #fff; }
+  .badge-star { background: #FBF3E2; color: #9A6B14; border: 1px solid #F0DEB4; }
+  .badge-cert { background: #EAF2EC; color: #2F6B43; border: 1px solid #CFE3D5; }
+  .badge-nocert { background: #F1F1EF; color: var(--ink-3); border: 1px solid #E2E0D8; }
+  .badge-remark { background: #F7ECEC; color: #A04B4B; border: 1px solid #EDD3D3; }
+
+  .price-block { border-top: 1px dashed var(--line); padding-top: 10px; display: grid; gap: 6px; }
+  .price-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; }
+  .price-label { color: var(--ink-3); }
+  .price-val { font-weight: 600; color: var(--ink); }
+  .price-val .yen { font-size: 12px; color: var(--ink-3); font-weight: 500; margin-right: 1px; }
+  .price-row.sub .price-val { color: #A06010; }
+
+  .card-foot {
+    margin-top: auto;
+    padding: 12px 16px 14px;
+    font-size: 13px; color: var(--brand); font-weight: 600;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  .poster-link {
+    color: #9A6B14; background: #FBF3E2; border: 1px solid #EED9A8;
+    border-radius: 999px; padding: 5px 13px; font-size: 12.5px; font-weight: 600;
+    white-space: nowrap; cursor: pointer; transition: all .15s ease;
+  }
+  .poster-link:hover { background: #F6E6C4; border-color: #D9A93F; }
+  .view-detail { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+  .card-foot svg { transition: transform .15s ease; }
+  .card:hover .card-foot svg { transform: translateX(3px); }
+
+  /* ============ 空状态 ============ */
+  .empty {
+    text-align: center; padding: 70px 20px 90px; color: var(--ink-3);
+  }
+  .empty svg { margin-bottom: 14px; }
+  .empty h3 { font-size: 17px; color: var(--ink-2); font-weight: 600; margin-bottom: 6px; }
+  .empty p { font-size: 14px; margin-bottom: 18px; }
+  .btn-clear2 {
+    border: 1px solid var(--brand); color: var(--brand); background: #fff;
+    border-radius: 10px; padding: 9px 18px; font-size: 14px; font-weight: 600;
+  }
+  .btn-clear2:hover { background: var(--brand); color: #fff; }
+
+  /* ============ 详情弹窗 ============ */
+  .modal { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .modal[hidden] { display: none; }
+  .modal-backdrop {
+    position: absolute; inset: 0; background: rgba(27,36,50,.55);
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+    animation: fadeIn .18s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal-card {
+    position: relative;
+    background: var(--card);
+    border-radius: 20px;
+    max-width: 640px; width: 100%;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    box-shadow: var(--shadow-lift);
+    animation: slideUp .2s ease;
+  }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .modal-backdrop, .modal-card { animation: none; }
+  }
+  .modal-close {
+    position: absolute; top: 12px; right: 12px; z-index: 2;
+    width: 34px; height: 34px; border-radius: 50%;
+    border: none; background: rgba(255,255,255,.92); color: var(--ink);
+    font-size: 18px; line-height: 1;
+    display: grid; place-items: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,.18);
+  }
+  .modal-close:hover { background: #fff; }
+
+  .m-poster {
+    position: relative; height: 190px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 9px; color: #fff; overflow: hidden;
+  }
+  .m-poster::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(300px 150px at 12% 0%, rgba(255,255,255,.18), transparent 60%),
+                radial-gradient(340px 180px at 100% 100%, rgba(0,0,0,.18), transparent 60%);
+    pointer-events: none;
+  }
+  .m-poster-stage { font-family: var(--serif); font-size: 34px; font-weight: 900; letter-spacing: .08em; }
+  .m-poster-subj { font-size: 13px; letter-spacing: .12em; opacity: .92; }
+  .m-poster-note {
+    position: absolute; right: 14px; bottom: 12px; font-size: 12px; opacity: .82;
+    border: 1px solid rgba(255,255,255,.5); border-radius: 999px; padding: 2px 11px; letter-spacing: .1em;
+  }
+  .m-poster-stars { display: flex; gap: 4px; }
+
+  .m-body { padding: 20px 24px 26px; }
+  .m-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .m-name { font-family: var(--serif); font-size: 24px; font-weight: 900; }
+  .m-stage { font-size: 14px; color: var(--ink-3); }
+
+  .m-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .m-poster-btn-row { margin-top: 14px; }
+  .poster-btn {
+    width: 100%;
+    border: 1px solid #E0C27E; background: linear-gradient(140deg, #FBF3E2, #F5E5C0);
+    color: #8A5F10; font-weight: 700; font-size: 14px;
+    border-radius: 10px; padding: 10px 16px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    box-shadow: 0 2px 8px rgba(217,154,43,.14);
+  }
+  .poster-btn:hover { filter: brightness(1.03); border-color: #D9A93F; }
+
+  /* ============ 海报大图弹窗 ============ */
+  .poster-lightbox { position: fixed; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .poster-lightbox[hidden] { display: none; }
+  .poster-lightbox-backdrop {
+    position: absolute; inset: 0; background: rgba(22,29,41,.72);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    animation: fadeIn .18s ease;
+  }
+  .poster-lightbox-card {
+    position: relative;
+    background: var(--card);
+    border-radius: 16px;
+    box-shadow: 0 24px 70px rgba(0,0,0,.4);
+    max-width: min(680px, 94vw);
+    max-height: 92vh;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    animation: popIn .2s ease;
+  }
+  @keyframes popIn { from { opacity: 0; transform: scale(.96) translateY(6px); } to { opacity: 1; transform: none; } }
+  .poster-lightbox-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 13px 18px;
+    border-bottom: 1px solid var(--line);
+    background: #FBFAF6;
+  }
+  .poster-lightbox-head .pl-name { font-family: var(--serif); font-weight: 800; font-size: 17px; color: var(--ink); }
+  .poster-lightbox-head .pl-actions { display: flex; align-items: center; gap: 9px; }
+  .poster-dl {
+    border: none; background: linear-gradient(140deg, #E9B355, #D99A2B);
+    color: #3A2A08; font-weight: 700; font-size: 13px;
+    border-radius: 9px; padding: 8px 16px; box-shadow: 0 2px 8px rgba(217,154,43,.28);
+  }
+  .poster-dl:hover { filter: brightness(1.05); }
+  .poster-lightbox-close {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1px solid var(--line); background: #fff; color: var(--ink-2);
+    font-size: 17px; line-height: 1; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .poster-lightbox-close:hover { border-color: var(--brand); color: var(--brand); }
+  .poster-lightbox-body {
+    padding: 14px; overflow: auto; text-align: center;
+    background: #F4F1E8; position: relative;
+  }
+  .poster-lightbox-body img {
+    max-width: 100%; max-height: calc(92vh - 110px);
+    border-radius: 10px; box-shadow: 0 10px 34px rgba(0,0,0,.22);
+  }
+  .pl-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(255,255,255,.92); border: none;
+    font-size: 26px; line-height: 1; color: #333;
+    cursor: pointer; box-shadow: 0 2px 10px rgba(0,0,0,.2);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2; padding: 0;
+  }
+  .pl-nav:hover { background: #fff; }
+  .pl-prev { left: 10px; }
+  .pl-next { right: 10px; }
+  .pl-counter {
+    position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,.6); color: #fff; font-size: 12px;
+    padding: 3px 12px; border-radius: 12px; z-index: 2;
+  }
+
+  .m-section { margin-top: 18px; }
+  .m-section h4 {
+    font-size: 13px; font-weight: 700; letter-spacing: .1em; color: var(--ink-3);
+    margin-bottom: 9px; padding-bottom: 6px; border-bottom: 1px solid var(--line);
+  }
+  .kv { display: grid; grid-template-columns: 88px 1fr; gap: 8px 14px; font-size: 14px; }
+  .kv dt { color: var(--ink-3); }
+  .kv dd { color: var(--ink); }
+  .kv dd .pend { color: var(--ink-3); }
+
+  /* 模块化展示：老师风格 / 匹配学生 */
+  .m-sub-block { margin-bottom: 12px; }
+  .m-sub-block:last-child { margin-bottom: 0; }
+  .m-sub-title {
+    display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .04em;
+    background: #EAF0F7; color: #2E5C8A;
+    border-radius: 6px; padding: 3px 10px; margin-bottom: 7px;
+  }
+  .match-high .m-sub-title { background: #FBEEDC; color: #B06A12; }
+  .match-mid .m-sub-title { background: #F7F0E0; color: #7A6F52; }
+  .m-list { list-style: none; margin: 0; padding: 0; }
+  .m-list li {
+    position: relative; padding-left: 15px;
+    font-size: 13.5px; color: var(--ink); line-height: 1.65; margin-bottom: 5px;
+  }
+  .m-list li::before {
+    content: ""; position: absolute; left: 0; top: 9px;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #C9A227;
+  }
+  .match-high .m-list li::before { background: #E8952E; }
+  .match-mid .m-list li::before { background: #C0B28A; }
+
+  .fee-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .fee-table th {
+    text-align: left; font-weight: 600; color: var(--ink-2);
+    font-size: 12px; letter-spacing: .06em; padding: 6px 8px;
+    background: #F7F4EC; border-radius: 6px;
+  }
+  .fee-table td { padding: 7px 8px; border-bottom: 1px dashed var(--line); }
+  .fee-table tr:last-child td { border-bottom: none; }
+  .fee-table td.num { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .fee-table td.muted { color: var(--ink-3); }
+
+  .m-note {
+    margin-top: 18px; font-size: 12px; color: var(--ink-3);
+    background: #F7F4EC; border-radius: 10px; padding: 10px 14px; line-height: 1.6;
+  }
+
+  /* ============ 页脚 ============ */
+  .foot {
+    border-top: 1px solid var(--line);
+    background: var(--paper-deep);
+    padding: 26px 20px 34px;
+    font-size: 12px; color: var(--ink-3); line-height: 1.9;
+  }
+  .foot .wrap { padding: 0; }
+
+  /* ============ 响应式 ============ */
+  @media (max-width: 768px) {
+    .hero { padding: 34px 14px 0; }
+    .wrap { padding: 0 14px; }
+    .grid { grid-template-columns: 1fr; gap: 14px; }
+    .filters label { flex: 1 1 auto; }
+    .filters select { flex: 1; width: 100%; }
+    .btn-reset { margin-left: 0; }
+    .modal { padding: 10px; }
+    .modal-card { max-height: calc(100vh - 20px); border-radius: 16px; }
+    .m-body { padding: 16px 16px 20px; }
+    .kv { grid-template-columns: 76px 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="brand-row">
+      <div class="brand-logo">
+        <img class="brand-symbol" src="https://aka.doubaocdn.com/s/Qk6wRafHLy" alt="实诚教育">
+        <div class="brand-text">
+          <span class="brand-zh">实诚教育</span>
+          <span class="brand-en">SHICHENG EDUCATION</span>
+        </div>
+      </div>
+      <div class="brand-name">一对一学管 · 教师档案</div>
+    </div>
+    <h1>教师信息查询</h1>
+    <p class="hero-sub">按学科、姓名、艺名、星级检索全部一对一教师，点击卡片查看完整档案</p>
+
+    <div class="search-panel">
+      <div class="search-box">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3.8-3.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <input id="searchInput" type="text" placeholder="输入姓名、艺名、学科或星级关键词…" autocomplete="off">
+      </div>
+      <div class="search-divider"></div>
+      <div class="filters">
+        <label>学科
+          <select id="fSubj">
+            <option value="">全部</option>
+            <option value="数学">数学</option>
+            <option value="物理">物理</option>
+            <option value="化学">化学</option>
+            <option value="语文">语文</option>
+            <option value="英语">英语</option>
+            <option value="思维">思维</option>
+          </select>
+        </label>
+        <label>星级
+          <select id="fStar">
+            <option value="">全部</option>
+            <option value="五星">五星</option>
+            <option value="四星">四星</option>
+            <option value="三星">三星</option>
+            <option value="二星">二星</option>
+            <option value="一星">一星</option>
+            <option value="不评级">不评级</option>
+          </select>
+        </label>
+        <label>教资
+          <select id="fCert">
+            <option value="">全部</option>
+            <option value="是">有教资</option>
+            <option value="否">无教资</option>
+          </select>
+        </label>
+        <label>排序
+          <select id="fSort">
+            <option value="starDesc">星级从高到低</option>
+            <option value="starAsc">星级从低到高</option>
+            <option value="name">按姓名</option>
+          </select>
+        </label>
+        <button class="btn-reset" id="btnReset" type="button">重置条件</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="match-panel wrap">
+  <div class="match-inner">
+    <div class="match-head">
+      <span class="match-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5v5l3.2 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        家长需求匹配
+      </span>
+      <span class="match-sub">描述您对老师的要求或孩子的情况，为您推荐合适的老师（可多选需求标签，至少选择 2 项）</span>
+    </div>
+    <div class="match-input-row">
+      <input id="matchInput" type="text" placeholder="如：初二数学，基础薄弱，希望老师耐心负责（或选下方标签）" autocomplete="off">
+      <button class="match-btn" id="matchBtn" type="button">开始匹配</button>
+    </div>
+    <div class="match-tags">
+      <span class="match-tag-label">常见需求（多选，至少 2 项）</span>
+      <div class="chips" id="matchChips"></div>
+    </div>
+    <div class="match-status" id="matchStatus" hidden></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="result-bar">
+    <div id="resultText"><b id="resultCount">0</b> 位教师</div>
+    <div class="result-hint" id="resultHint">点击卡片查看完整档案</div>
+  </div>
+  <div id="grid" class="grid"></div>
+  <div id="empty" class="empty" hidden>
+    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="#C4BFB2" stroke-width="1.6"/><path d="M20 20l-3.8-3.8" stroke="#C4BFB2" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <h3>没有找到符合条件的老师</h3>
+    <p>试试更换关键词，或放宽学科、星级筛选条件</p>
+    <button class="btn-clear2" id="btnClear2" type="button">清除全部条件</button>
+  </div>
+</main>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-backdrop" id="modalBackdrop"></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="mName">
+    <button class="modal-close" id="modalClose" type="button" aria-label="关闭">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+    </button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div class="poster-lightbox" id="posterLightbox" hidden>
+  <div class="poster-lightbox-backdrop" id="posterLightboxBackdrop"></div>
+  <div class="poster-lightbox-card" role="dialog" aria-modal="true" aria-label="老师海报">
+    <div class="poster-lightbox-head">
+      <span class="pl-name" id="posterLightboxName"></span>
+      <div class="pl-actions">
+        <button class="poster-dl" id="posterDlBtn" type="button">下载海报</button>
+        <button class="poster-lightbox-close" id="posterLightboxClose" type="button" aria-label="关闭">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="poster-lightbox-body">
+      <button class="pl-nav pl-prev" id="posterPrevBtn" type="button" aria-label="上一张" hidden>‹</button>
+      <img id="posterLightboxImg" src="" alt="老师海报">
+      <button class="pl-nav pl-next" id="posterNextBtn" type="button" aria-label="下一张" hidden>›</button>
+      <div class="pl-counter" id="posterCounter" hidden></div>
+    </div>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <div>数据来源：教师评级表 · 教师评级课时费表（2026-07-31 版）·（4-9年级）星级老师收费标准；老师价格仅展示 4-9年级 面授/线上收费</div>
+    <div>联系方式、老师海报、老师风格、匹配学生等信息源文件暂未提供，显示为“待补充”，将在数据更新后完善。</div>
+  </div>
+</footer>
+
+<script>
+"use strict";
+/* ============ 数据（由 Excel 合并生成） ============ */
+const TEACHERS = [{"id":1,"name":"丁明昊","stage":"大丁老师","subject":"语文","cat":"语文","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":2,"name":"乔娟","stage":"乔乔","subject":"初数","cat":"数学","rating":"四星","rorder":4,"cert":"否","star_fee":160,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":600,"fee49_online":500,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":3,"name":"于富全","stage":"于富全","subject":"小奥","cat":"数学","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":4,"name":"付仕","stage":"付老师","subject":"语文","cat":"语文","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":5,"name":"任建苁","stage":"文心老师","subject":"语文","cat":"语文","rating":"一星","rorder":1,"cert":"否","star_fee":70,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":6,"name":"何君研","stage":"小何老师","subject":"物理","cat":"物理","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":7,"name":"何斯琴","stage":"","subject":"初数","cat":"数学","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":8,"name":"佟伟杰","stage":"大佟老师","subject":"物理","cat":"物理","rating":"五星","rorder":5,"cert":"是","star_fee":200,"f_early_face":100,"f_9th_face":170,"f_early_online":80,"f_9th_online":150,"fee49_face":700,"fee49_online":600,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":9,"name":"冯若欣","stage":"大冯老师","subject":"小奥","cat":"数学","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":10,"name":"刘佳玮","stage":"Jessie老师","subject":"英语","cat":"英语","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":11,"name":"刘元凯","stage":"大凯老师","subject":"高物","cat":"物理","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":150,"f_9th_face":150,"f_early_online":150,"f_9th_online":150,"fee49_face":null,"fee49_online":null,"remark":"高学历","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":12,"name":"刘叶","stage":"叶子老师","subject":"英语","cat":"英语","rating":"一星","rorder":1,"cert":"是","star_fee":80,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":13,"name":"刘宗博","stage":"大名","subject":"初数","cat":"数学","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":14,"name":"刘彦志","stage":"Levi老师","subject":"英语","cat":"英语","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":15,"name":"刘敏哲","stage":"大哲老师","subject":"高物","cat":"物理","rating":"不评级","rorder":0,"cert":"是","star_fee":"按原课时费","f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"高中部","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":16,"name":"刘柯言","stage":"柯言老师","subject":"初数","cat":"数学","rating":"一星","rorder":1,"cert":"否","star_fee":70,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":17,"name":"刘梦晗","stage":"莓莓老师","subject":"英语","cat":"英语","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":18,"name":"刘玥","stage":"玥玥老师","subject":"思维","cat":"思维","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":90,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":19,"name":"刘硕","stage":"大刘老师","subject":"高物","cat":"物理","rating":"不评级","rorder":0,"cert":"是","star_fee":"按原课时费","f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"高中部","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":20,"name":"刘紫函","stage":"大函老师","subject":"物理","cat":"物理","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":21,"name":"刘言","stage":"Jasmine","subject":"英语","cat":"英语","rating":"四星","rorder":4,"cert":"是","star_fee":170,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":600,"fee49_online":500,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":22,"name":"刘雅婷","stage":"小雅老师","subject":"小奥","cat":"数学","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":23,"name":"努尔古丽.依马尔","stage":"古丽老师","subject":"英语","cat":"英语","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":24,"name":"卢疑霞","stage":"Lucy老师","subject":"英语","cat":"英语","rating":"四星","rorder":4,"cert":"是","star_fee":170,"f_early_face":140,"f_9th_face":170,"f_early_online":120,"f_9th_online":150,"fee49_face":600,"fee49_online":500,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":25,"name":"卢辰鹏","stage":"大鹏老师","subject":"物理","cat":"物理","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":26,"name":"吴威龙","stage":"大威老师","subject":"高数","cat":"数学","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":150,"f_9th_face":150,"f_early_online":150,"f_9th_online":150,"fee49_face":null,"fee49_online":null,"remark":"高学历","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":27,"name":"周亦安","stage":"小周老师","subject":"初数","cat":"数学","rating":"不评级","rorder":0,"cert":"是","star_fee":"按原课时费","f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":28,"name":"周杰","stage":"大周老师","subject":"小奥","cat":"数学","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":29,"name":"周龙龙","stage":"龙龙老师","subject":"初数","cat":"数学","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":30,"name":"夏梦宁","stage":"夏夏老师","subject":"初数","cat":"数学","rating":"一星","rorder":1,"cert":"是","star_fee":80,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":31,"name":"姜星彤","stage":"Arianna","subject":"英语","cat":"英语","rating":"一星","rorder":1,"cert":"","star_fee":null,"f_early_face":null,"f_9th_face":null,"f_early_online":null,"f_9th_online":null,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":32,"name":"孔青扬","stage":"小青老师","subject":"语文总监","cat":"语文","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":33,"name":"孔香文","stage":"文文老师","subject":"思维","cat":"思维","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":90,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":34,"name":"孙文硕","stage":"孙策老师","subject":"初数","cat":"数学","rating":"一星","rorder":1,"cert":"否","star_fee":70,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":35,"name":"孙昕宇","stage":"大悟老师","subject":"小奥","cat":"数学","rating":"五星","rorder":5,"cert":"否","star_fee":190,"f_early_face":90,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":700,"fee49_online":600,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":36,"name":"季杨盛","stage":"白杨老师","subject":"高数","cat":"数学","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":150,"f_9th_face":150,"f_early_online":150,"f_9th_online":150,"fee49_face":null,"fee49_online":null,"remark":"高学历","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":37,"name":"宁玉平","stage":"大宁老师","subject":"物理总监","cat":"物理","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":120,"f_9th_face":170,"f_early_online":100,"f_9th_online":150,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":38,"name":"安志伟","stage":"大卫老师","subject":"初数","cat":"数学","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":39,"name":"安麒运","stage":"大麒老师","subject":"初数","cat":"数学","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":40,"name":"宋美娜","stage":"小宋老师","subject":"物理","cat":"物理","rating":"四星","rorder":4,"cert":"否","star_fee":160,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":600,"fee49_online":500,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":41,"name":"崔喜政","stage":"大崔老师","subject":"物理","cat":"物理","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":42,"name":"左翔云","stage":"左老师","subject":"初数","cat":"数学","rating":"一星","rorder":1,"cert":"是","star_fee":80,"f_early_face":170,"f_9th_face":170,"f_early_online":150,"f_9th_online":150,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":43,"name":"巩建刚","stage":"大巩老师","subject":"小奥总监","cat":"数学","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":44,"name":"康佳妮","stage":"Connie老师","subject":"英语总监","cat":"英语","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":45,"name":"张倜雅","stage":"Tia老师","subject":"英语","cat":"英语","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":160,"f_9th_face":160,"f_early_online":150,"f_9th_online":150,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":46,"name":"张其琛","stage":"大琛老师","subject":"物理","cat":"物理","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":47,"name":"张婷","stage":"Anne老师","subject":"英语","cat":"英语","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":48,"name":"张孟","stage":"小孟老师","subject":"语文","cat":"语文","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":49,"name":"张宇航","stage":"大航老师","subject":"物理","cat":"物理","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":50,"name":"张宗润","stage":"大正老师","subject":"物理","cat":"物理","rating":"一星","rorder":1,"cert":"否","star_fee":70,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":51,"name":"张峥","stage":"圆圆老师","subject":"语文","cat":"语文","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":52,"name":"张庆红","stage":"小红老师","subject":"初数","cat":"数学","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":53,"name":"张志铭","stage":"大佑老师","subject":"物理","cat":"物理","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":54,"name":"张林凤","stage":"林凤老师","subject":"化学","cat":"化学","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":55,"name":"张欢欢","stage":"张欢老师","subject":"语文","cat":"语文","rating":"不评级","rorder":0,"cert":"是","star_fee":"按原课时费","f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"产假","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":56,"name":"张涵越","stage":"Yolia老师","subject":"英语","cat":"英语","rating":"一星","rorder":1,"cert":"否","star_fee":70,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":57,"name":"张璇璇","stage":"璇璇老师","subject":"物理","cat":"物理","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":58,"name":"张石环","stage":"小珊老师","subject":"初数","cat":"数学","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":59,"name":"张譞","stage":"大宣老师","subject":"高物","cat":"物理","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":150,"f_9th_face":150,"f_early_online":150,"f_9th_online":150,"fee49_face":null,"fee49_online":null,"remark":"高学历","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":60,"name":"张雅蓓","stage":"蓓蓓老师","subject":"幼小","cat":"数学","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"https://aka.doubaocdn.com/s/Y2N0fAfkHu","style":"高频问答型·即时纠错型·讲练结合型·生活化讲解型·方法总结型教学；互动以高频真实问答、学生报答案/说思路、学生独立做题、追问原因为主，学生高活跃（含大量生活闲聊）；纠错以即时判断、引导纠错、错因追溯、先肯定后纠正、概念边界强化（余数<除数）为主；课堂控制较强偏宽松、限时管理、注意力拉动、休息与进度管理、家长联动；内容生活化、校内同步、公式归纳、方法步骤化（和倍五步）、习惯养成（单位/答语/检验）。主要优势：①讲练结合闭环完整，作业检查→错题精讲→新授→学生口算/抄写/列式→独立做迁移题，每个知识点都落到学生手上，学生当堂会做而非听懂了；②生活化讲解大幅降低理解门槛（竖式=盖小工厂、和倍=线段图+钱的例子），抽象概念变成可感画面，低年级学生听得懂记得住；③即时纠错+追问思路，错题先让学生自查再逐层追问，纠的是错因而非只判对错；④公式与方法步骤化，帮学生建立可复用工具（平均数=总数÷总份数、和倍问题五步法），拿到题有固定打法、不靠猜；⑤课堂氛围亲和、情绪支持充分（宝贝儿称呼、容忍学生聊猫聊狗、允许休息10分钟、认错自然），低龄学生安全感强、敢开口敢犯错；⑥家长联动机制成熟（转述妈妈反馈调整重点、作业拍照发群批改），家校信息闭环、教学有的放矢。","match_high":"小学2-4年级的学生；基础薄弱或中等偏弱，需要把校内概念再讲透一遍；反应速度中速即可；容易走神但能被拉回；愿意开口、愿意答错；抗压能力普通水平即可；话多但表达零碎；能接受即时纠错与重新想一想；当前问题：除法竖式不熟、余数概念不清、平均数/和倍问题初学、书写习惯（单位/答语）待养成；低龄、话多活泼、需要被接住、需要建立长期信任关系的学生。","match_mid":"需要更快进度的学生，可要求老师增加题量、压缩闲聊时间；需要更多完整表达训练的学生，可要求老师增加你来完整讲一遍环节；高敏感学生，需提前沟通老师减少认真点式催促、增加肯定频率。"},{"id":61,"name":"徐可","stage":"Yolanda老师","subject":"英语","cat":"英语","rating":"一星","rorder":1,"cert":"否","star_fee":70,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":62,"name":"徐海涯","stage":"牙牙老师","subject":"思维","cat":"思维","rating":"不评级","rorder":0,"cert":"是","star_fee":"按原课时费","f_early_face":120,"f_9th_face":null,"f_early_online":100,"f_9th_online":null,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":63,"name":"曹英男","stage":"英男","subject":"初数","cat":"数学","rating":"一星","rorder":1,"cert":"","star_fee":null,"f_early_face":null,"f_9th_face":null,"f_early_online":null,"f_9th_online":null,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":64,"name":"朱孟莹","stage":"小莹老师","subject":"小奥","cat":"数学","rating":"一星","rorder":1,"cert":"是","star_fee":80,"f_early_face":100,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":65,"name":"李丕玉","stage":"大利老师","subject":"初数","cat":"数学","rating":"四星","rorder":4,"cert":"是","star_fee":170,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":600,"fee49_online":500,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":66,"name":"李佩洁","stage":"洁洁老师","subject":"物理","cat":"物理","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":67,"name":"李冕卿","stage":"大冕老师","subject":"初数","cat":"数学","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":68,"name":"李彦君","stage":"大君老师","subject":"小奥","cat":"数学","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"https://aka.doubaocdn.com/s/HZrYU7emqp","style":"苏格拉底式引导型·原理拆解型·方法总结型·学习习惯培养型教学；互动以高频追问、学生完整表达、学生自己总结、连续追问、学生主动质疑为主；纠错以引导纠错、错因追溯、直接纠错、改进建议为主；课堂控制较强、允许提问质疑、节奏稳定、目标导向；内容原理优先、类比丰富、方法体系化、自编教材、分班考导向、学习习惯。主要优势：①苏格拉底式引导，不直接给公式，通过一连串追问让学生自己发现原理（等差数列通项公式从植树问题推导、定义新运算引导发现隐藏条件），学生理解公式来源与本质、记忆更牢、迁移能力更强；②每道题后系统方法总结，总结考什么知识点、哪容易错、这种题该怎么想（定义新运算四步法：分析新定义→找潜在条件→多解验证→注意特殊要求；巧算总结凑整/分解/带符号搬家/积不变性质等方法体系），从会做一道题升级为会做一类题；③特别重视学习习惯培养，授人以渔（不同颜色笔改错、标记错因、自己总结知识点、计算习惯、笔记习惯），学习习惯是长期提分的根本、减少对老师依赖；④学生输出量极大，课堂以学生为主体（录音中学生发言278次/11978字超过老师，学生报答案、完整讲思路、自己总结、主动提问质疑），老师能实时掌握学生理解程度；⑤原理拆解细致，从根源解决疑问（变号问题从四则运算顺序→中括号必要性→去括号变号原理一步步拆解），学生理解为什么而不是只记怎么做；⑥自编教材，精准对接分班考（教材从分班考真题里抠出来、清楚区分竞赛题和分班考题差异、根据分班考需求调整教学重点）。","match_high":"小学五、六年级，面临分班考/择校考/杯赛、有培优拔高需求的学生；基础中等及以上（学过竞赛、有数感）；爱思考、爱提问、敢反驳；愿意开口讲思路、报答案；需要把公式讲懂、需要方法总结与学习习惯培养；抗压与纠错接受度一般即可（课堂无批评性话语）；常见问题：会算但说不清为什么、刷题多但不会总结、易在变号/丢数等细节失分。","match_mid":"基础薄弱或较弱但愿意跟着想的学生，老师会细讲原理，但需老师放慢简单过知识点的速度、增加检查性提问；需要老师多肯定的学生，可请老师增加鼓励性反馈；匹配条件：顾问提前告知老师孩子基础偏弱/比较内向，请多留白、多确认。"},{"id":69,"name":"李心怡","stage":"心心老师（语文老师）","subject":"语文","cat":"语文","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":70,"name":"李桂花","stage":"李桂花","subject":"小奥","cat":"数学","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":71,"name":"李浩","stage":"大理老师","subject":"语文","cat":"语文","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":72,"name":"李海龙","stage":"大龙老师","subject":"初数","cat":"数学","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":73,"name":"李涵","stage":"小涵老师","subject":"语文","cat":"语文","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":74,"name":"李焱","stage":"大焱老师","subject":"物理","cat":"物理","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":75,"name":"李硕","stage":"硕硕老师","subject":"思维","cat":"思维","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":90,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":76,"name":"李竺蔚","stage":"小蔚老师","subject":"物理","cat":"物理","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":77,"name":"李雨坤","stage":"雨坤老师","subject":"高数","cat":"数学","rating":"不评级","rorder":0,"cert":"是","star_fee":"按原课时费","f_early_face":150,"f_9th_face":150,"f_early_online":150,"f_9th_online":150,"fee49_face":null,"fee49_online":null,"remark":"高学历","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":78,"name":"李雪彤","stage":"雪彤老师","subject":"语文","cat":"语文","rating":"不评级","rorder":0,"cert":"是","star_fee":"按原课时费","f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"产假","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":79,"name":"杜祥武","stage":"大衡老师","subject":"物理","cat":"物理","rating":"一星","rorder":1,"cert":"否","star_fee":70,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":80,"name":"杨卓","stage":"Jocelyn老师","subject":"英语","cat":"英语","rating":"一星","rorder":1,"cert":"是","star_fee":80,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":81,"name":"杨建强","stage":"大杨老师","subject":"初数","cat":"数学","rating":"五星","rorder":5,"cert":"是","star_fee":200,"f_early_face":170,"f_9th_face":170,"f_early_online":150,"f_9th_online":150,"fee49_face":700,"fee49_online":600,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":82,"name":"杨泽华","stage":"木易老师","subject":"化学","cat":"化学","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":83,"name":"杨迪","stage":"杨迪","subject":"思维","cat":"思维","rating":"不评级","rorder":0,"cert":"是","star_fee":"按原课时费","f_early_face":100,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":84,"name":"果佳玉","stage":"小果老师","subject":"初数","cat":"数学","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":85,"name":"栗瑞秀","stage":"小栗老师","subject":"初数","cat":"数学","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":86,"name":"樊思周","stage":"大思","subject":"物理","cat":"物理","rating":"一星","rorder":1,"cert":"","star_fee":null,"f_early_face":null,"f_9th_face":null,"f_early_online":null,"f_9th_online":null,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":87,"name":"毛妍蓉","stage":"小毛老师","subject":"思维","cat":"思维","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":90,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":88,"name":"洪茂恒","stage":"大润老师","subject":"高数","cat":"数学","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":150,"f_9th_face":150,"f_early_online":150,"f_9th_online":150,"fee49_face":null,"fee49_online":null,"remark":"高学历","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":89,"name":"王中禹","stage":"大星老师","subject":"物理","cat":"物理","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":90,"name":"王傲","stage":"大傲老师","subject":"高数","cat":"数学","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":150,"f_9th_face":150,"f_early_online":150,"f_9th_online":150,"fee49_face":null,"fee49_online":null,"remark":"高学历","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":91,"name":"王博","stage":"大博老师","subject":"物理","cat":"物理","rating":"不评级","rorder":0,"cert":"是","star_fee":"按原课时费","f_early_face":100,"f_9th_face":170,"f_early_online":80,"f_9th_online":150,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":92,"name":"王可心","stage":"大明老师","subject":"物理","cat":"物理","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":93,"name":"王奎","stage":"大奎","subject":"初数","cat":"数学","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":94,"name":"王妍","stage":"椒盐老师","subject":"语文","cat":"语文","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":95,"name":"王宇晗","stage":"大千老师","subject":"物理","cat":"物理","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":96,"name":"王松松","stage":"松松老师","subject":"物理","cat":"物理","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":97,"name":"王柳新","stage":"王柳新","subject":"小奥","cat":"数学","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":98,"name":"王禹","stage":"大王老师","subject":"初数","cat":"数学","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":99,"name":"王筱童","stage":"筱童老师","subject":"英语","cat":"英语","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":100,"name":"王莹","stage":"莹莹老师","subject":"思维","cat":"思维","rating":"不评级","rorder":0,"cert":"是","star_fee":"按原课时费","f_early_face":100,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":101,"name":"王诺","stage":"小兮","subject":"初数","cat":"数学","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":102,"name":"王雪妍","stage":"小妍老师","subject":"初数","cat":"数学","rating":"一星","rorder":1,"cert":"否","star_fee":70,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":103,"name":"王雪敏","stage":"小雪老师","subject":"小奥","cat":"数学","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":120,"f_9th_face":null,"f_early_online":100,"f_9th_online":null,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":104,"name":"田子上","stage":"小麦老师","subject":"语文","cat":"语文","rating":"一星","rorder":1,"cert":"是","star_fee":80,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":105,"name":"田润杰","stage":"大田老师","subject":"初数总监","cat":"数学","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":106,"name":"申健","stage":"大中老师","subject":"物理","cat":"物理","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":107,"name":"石翔宇","stage":"大翔老师","subject":"高数","cat":"数学","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":150,"f_9th_face":150,"f_early_online":150,"f_9th_online":150,"fee49_face":null,"fee49_online":null,"remark":"高学历","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":108,"name":"石赛杰","stage":"大石老师","subject":"小奥","cat":"数学","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":109,"name":"祁俊胜","stage":"大涛老师","subject":"物理","cat":"物理","rating":"五星","rorder":5,"cert":"是","star_fee":200,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":700,"fee49_online":600,"remark":"","contact":"","poster":"https://aka.doubaocdn.com/s/S8ZJsdnOyj","style":"题目推进型·即时纠错型·概念辨析型教学，课堂高频短问答、直接纠错与错因追溯，控制力强、注意力拉动、任务导向、进度驱动；擅长生活化案例讲解（腊肉飘香讲扩散、水银讲液态金属、饭菜飘香讲分子运动）、易错点强化与概念辨析，知识框架结构化，应试技巧传导直接。主要优势：高频易错点辨析突出、即时反馈闭环（错误不过夜）、生活化案例丰富、知识框架清晰、提分导向明确。","match_high":"基础中等以上、学校已同步学过热学、概念半生不熟、做题凭感觉的学生；反应较快、能跟上高频问答；容易走神、需要外部拉动；主动性中等即可；抗压较强、能接受直接纠错；常见问题：概念混淆（热量/内能/温度）、选择题失分多。","match_mid":"基础薄弱但配合度高、性格皮实的学生，需老师放慢节奏、减少单题追问、先讲概念再做题；慢加工但抗压的学生，需增加等待时间；匹配条件：家长/顾问提前与老师沟通调整策略。"},{"id":110,"name":"程儒民","stage":"大程老师","subject":"初数","cat":"数学","rating":"四星","rorder":4,"cert":"是","star_fee":170,"f_early_face":100,"f_9th_face":170,"f_early_online":80,"f_9th_online":150,"fee49_face":600,"fee49_online":500,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":111,"name":"程程","stage":"程程老师","subject":"幼小总监","cat":"数学","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":112,"name":"穆浩楠","stage":"大穆老师","subject":"物理","cat":"物理","rating":"四星","rorder":4,"cert":"否","star_fee":160,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":600,"fee49_online":500,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":113,"name":"胡博宁","stage":"古月老师","subject":"化学","cat":"化学","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":114,"name":"胡天龙","stage":"天龙老师","subject":"高物","cat":"物理","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":115,"name":"胡海洋","stage":"海洋老师","subject":"初数","cat":"数学","rating":"四星","rorder":4,"cert":"是","star_fee":170,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":600,"fee49_online":500,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":116,"name":"薛倩","stage":"小倩老师","subject":"物理","cat":"物理","rating":"四星","rorder":4,"cert":"是","star_fee":170,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":600,"fee49_online":500,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":117,"name":"袁伟霞","stage":"小袁老师","subject":"英语","cat":"英语","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":118,"name":"贾凯庆","stage":"大庆老师","subject":"物理","cat":"物理","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":119,"name":"赵万龙","stage":"大腕老师","subject":"初数","cat":"数学","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":120,"name":"邹一舟","stage":"大舟老师","subject":"高数","cat":"数学","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":150,"f_9th_face":150,"f_early_online":150,"f_9th_online":150,"fee49_face":null,"fee49_online":null,"remark":"高学历","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":121,"name":"郑月雪","stage":"小月","subject":"初数","cat":"数学","rating":"一星","rorder":1,"cert":"","star_fee":null,"f_early_face":null,"f_9th_face":null,"f_early_online":null,"f_9th_online":null,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":["https://aka.doubaocdn.com/s/jsmpR0GxIt","https://aka.doubaocdn.com/s/AmdqgTv3UG"],"style":"讲授示范型·模型推导型（性质→推论→应用）·几何模型专题型教学；互动以演讲式设问、自问自答为主（本样本无学生互动）；课堂讲解组织有序、分步标注、颜色笔区分问次；内容几何模型（八字模型/对顶角/角平分线）、从特殊到一般、代数化简。主要优势：①模型性质完整推导，重视结论怎么来的（从对顶角相等+三角形内角和180°推出八字模型角度推论），不背结论、理解推导、模型迁移不易忘；②三问递进设计从特殊到一般（具体数值45°→60°→未知角代数证明），逻辑严密，培养一般化思维；③步骤原因标注清晰，每步说明依据（三角形内角和、邻补角、角平分线），可作标准解题范本；④带教边界自述诚实清晰（没带过90分以上、北京新定义讲不了、除高三压轴题其他都可带），排课可直接避雷；⑤学历与经验背景明确（兰州大学、有教培经验，带教覆盖面初一到高二、可跨学段）。","match_high":"初一至初二、初三基础复习阶段的学生；基础薄弱或中低分段（90分以下，与老师自述带教经历一致）；需要理解几何模型性质的推导过程、需要规范推理表达、需要从特殊到一般的思维训练；能课后自主复现练习的学生收益最大。","match_mid":"中等生想突破几何压轴的学生，可匹配代综、几综类（老师自述可带），但需在真实互动课上验证讲解能否转化为引导；高中生（非北京压轴），老师自述可带全国卷题型，需先试课确认衔接；匹配条件：建议先排1节互动诊断课，观察提问、等待与纠错能力。注意：老师自述北京新定义题讲不了、没带过90分以上学生、高三压轴题不带，排课时请避开。"},{"id":122,"name":"郑长宇","stage":"大宇老是","subject":"物理","cat":"物理","rating":"不评级","rorder":0,"cert":"是","star_fee":"按原课时费","f_early_face":170,"f_9th_face":170,"f_early_online":150,"f_9th_online":150,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":123,"name":"郝崇新","stage":"大伟老师","subject":"高物","cat":"物理","rating":"不评级","rorder":0,"cert":"否","star_fee":"按原课时费","f_early_face":150,"f_9th_face":150,"f_early_online":150,"f_9th_online":150,"fee49_face":null,"fee49_online":null,"remark":"高学历","contact":"","poster":"https://aka.doubaocdn.com/s/NoVNqZ0omW","style":"班课讲授型·高频确认型提问·公式方法总结型·实验专题型·学生讲题型教学；互动以班课集体确认、点名回答、学生完整讲题、线上公屏互动、高频短问答为主；纠错以即时纠错、直接纠错、引导纠错、错因追溯、规范强调为主；课堂控制较强偏宽松、练习时间管理、休息管理、线上线下覆盖、容错氛围；内容公式体系化、逐差法、实验专题、易错点密集、高考导向、情境化题目。主要优势：①班课互动充分，线上线下全覆盖（集体确认型提问贯穿全程、线上公屏互动、点名回答、让学生上台完整讲题），班课不变成单向灌输；②公式与方法体系化，系统总结Δx=aT²、逐差法（偶数/奇数个点分别讲）、中间时刻速度=平均速度、初速度为零的匀变速结论，拿到题有固定打法；③易错点与规范意识极强（g取9.8、先接通电源再释放小车、矢量正负方向、N个点=N-1段时间、有效数字），直击得分关键；④实验教学扎实，覆盖高考实验题全流程（打点计时器从原理→仪器→操作→误差→数据处理→v-t图像→注意事项，配合实验视频）；⑤情绪支持与容错，班课氛围安全（算错很正常、容忍学生沉默、畏惧考试改自测）；⑥诚实认错，教学可信度高（发现错题直接承认、自己算乱说一会再看、学生讲错不否定而是引导）。","match_high":"高中一二年级，物理运动学/力学基础阶段的学生；基础薄弱或中等偏弱，需要把物理概念和公式再讲透一遍；能适应班课节奏，愿意在集体中回答或被点名；需要系统掌握运动学公式与方法、需要实验题处理能力、需要在规范与易错点上少丢分；抗压能力普通水平即可（纠错偏直接但氛围容错）；当前问题：自由落体/匀变速公式不熟、实验题不会处理纸带、g取值/矢量方向/有效数字等规范丢分；基础偏弱、容易紧张的学生。","match_mid":"基础偏弱学生，班课进度可能偏快，需老师额外点名关注、课后补答疑；需要更快进度的学生，可要求老师增加题量、压缩练习时间；高敏感学生，需提前沟通老师减少直接纠错措辞、增加肯定频率。"},{"id":124,"name":"郭清源","stage":"Holiday老师","subject":"英语","cat":"英语","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":125,"name":"郭玲玲","stage":"玲玲老师","subject":"思维","cat":"思维","rating":"不评级","rorder":0,"cert":"是","star_fee":"按原课时费","f_early_face":100,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":126,"name":"金帅","stage":"大帅老师","subject":"初数","cat":"数学","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":127,"name":"金钊","stage":"金钊老师","subject":"英语","cat":"英语","rating":"二星","rorder":2,"cert":"是","star_fee":110,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":128,"name":"钱佳佳","stage":"佳佳老师","subject":"高物","cat":"物理","rating":"不评级","rorder":0,"cert":"是","star_fee":"按原课时费","f_early_face":100,"f_9th_face":170,"f_early_online":80,"f_9th_online":150,"fee49_face":null,"fee49_online":null,"remark":"高中部","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":129,"name":"陈佳璇","stage":"派派","subject":"初数","cat":"数学","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":130,"name":"陈廷轩","stage":"大廷老师","subject":"初数","cat":"数学","rating":"一星","rorder":1,"cert":"否","star_fee":70,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":131,"name":"陈颖","stage":"心心老师","subject":"初数","cat":"数学","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":132,"name":"韩雨","stage":"小雨","subject":"思维","cat":"思维","rating":"不评级","rorder":0,"cert":"是","star_fee":"按原课时费","f_early_face":100,"f_9th_face":null,"f_early_online":80,"f_9th_online":null,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":133,"name":"顾娜","stage":"Natalie老师","subject":"英语","cat":"英语","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":134,"name":"马俊瑶","stage":"","subject":"初数","cat":"数学","rating":"一星","rorder":1,"cert":"否","star_fee":70,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":135,"name":"高丹","stage":"菜菜老师","subject":"英语","cat":"英语","rating":"三星","rorder":3,"cert":"否","star_fee":130,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":136,"name":"高晓硕","stage":"晓硕老师","subject":"语文","cat":"语文","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":500,"fee49_online":400,"remark":"","contact":"","poster":"https://aka.doubaocdn.com/s/XJJqYpqxrz","style":"知识框架型·提问复习型·题型讲评型教学（结构化梳理—回忆提问—讲练结合）；互动以回忆提取型提问、连续追问、学生短答、教师追问补全为主；纠错以引导纠错、规则重讲、易错点强调、思维定势纠正、术语规范为主；课堂任务导向、作业检查、限时训练、中等控制；内容应试导向、答题模板、知识结构化、题型识别、学校同步。主要优势：①知识结构化能力极强，擅长搭框架，约20分钟过完议论文体系（论点/论据/论证→分类→特征→作用→方法），给学生可迁移的知识地图；②答题模板与评分视角直接，先问考哪个知识点再给标准答法结构（第一步答论证方法、第二步答作用），并拆解分值（4分=中心论点1分+3个分论点各1分），提分导向明确；③纠错以引导为主，讲错因而非只判对错，教学生判断方法；④等待时间充足，允许学生慢慢想，答不出时降难度重问而非直接给答案；⑤教题型识别的元认知方法，从逐题背答案升级为识别题型→调用方法。","match_high":"语文基础中等、议论文知识听过但不成体系、答题凭感觉的学生；反应速度中速即可（老师等待时间长）；能跟随课堂节奏、愿意开口回答（课堂依赖师生问答推进）；能接受被直接指出问题；表达能力一般即可（老师会追问补全）；对纠错接受度中等以上；常见问题：议论文阅读失分多（论据判断、论证方法作用、段落作用题）、答题不规范、不会拆题型。","match_mid":"基础薄弱或较弱、记忆力一般的学生，需老师减少回忆提取密度、允许翻笔记；能接受批评但偶尔拖拉的学生，需把批评换成约定补救方案；匹配条件：顾问提前与老师沟通，多给正向反馈、把作业检查移到课后单独沟通。"},{"id":137,"name":"魏旭泽","stage":"大魏老师","subject":"物理","cat":"物理","rating":"二星","rorder":2,"cert":"否","star_fee":100,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""},{"id":138,"name":"黄龙雨","stage":"大雨老师","subject":"初数","cat":"数学","rating":"一星","rorder":1,"cert":"否","star_fee":70,"f_early_face":90,"f_9th_face":140,"f_early_online":80,"f_9th_online":130,"fee49_face":400,"fee49_online":300,"remark":"","contact":"","poster":"https://aka.doubaocdn.com/s/FTDUd4QOtN","style":"讲授示范型·思想方法提炼型·压轴题讲解型教学（录播/示范性质）；互动以演讲式设问、自问自答为主（本样本无学生互动）；课堂课程组织强、流程规范、板书操作（缩放/擦除/旁注）；内容数形结合、分类讨论、对称性、配方法、边界辨析、中考应试。主要优势：①完整示范压轴题标准解题流程，读题→思想识别→预处理→分类→作图→列式→合并，全程无跳跃、每步标注目的，可直接作范本；②思想方法显性化，明确命名数形结合、分类讨论、对称性、配方法并解释用途，帮学生建立方法库，从会做这一题到知道这类题用什么思想；③边界取等辨析严谨（≥/≤与>/<的边界，P点与B点重合时取大于号不取大于等于号），直击压轴题得分关键；④结尾总结复盘，提炼分类讨论的两个基点数形结合的两个重点，形成可复用套路；⑤自述以带基础与巩固学生为主，教学定位踏实。","match_high":"初三、目标中考拔高冲刺与压轴题突破的学生；基础中上（已掌握二次函数图像与性质、不等式）；能跟着完整流程走、课后愿意自主复现练习；需要压轴题标准解题方法、需要数形结合/分类讨论等思想方法体系、需要边界辨析能力；能自己完成听懂→复做→验证闭环的学生收益最大。","match_mid":"基础中等但想突破压轴的学生，可匹配，但需老师在真实课上放慢节奏、增加提问确认与练习验证；需要互动引导的学生，需老师先展示提问、等待与纠错能力后再定匹配度；匹配条件：建议先排1节互动诊断课，观察老师能否把示范切换为引导。"},{"id":139,"name":"默川","stage":"山川老师","subject":"初高数","cat":"数学","rating":"三星","rorder":3,"cert":"是","star_fee":140,"f_early_face":100,"f_9th_face":150,"f_early_online":80,"f_9th_online":130,"fee49_face":null,"fee49_online":null,"remark":"","contact":"","poster":"","style":"","match_high":"","match_mid":""}];
+
+/* ============ 工具函数 ============ */
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function yen(n) {
+  if (n === null || n === undefined) return '<span class="muted">—</span>';
+  return '<span class="yen">¥</span>' + n;
+}
+
+/* 星级：金色星数 = rorder，不评级显示灰色空心 */
+const SUBJ_COLORS = {
+  "数学": ["#2E5C8A", "#3E7CB8"],
+  "物理": ["#2F7D6E", "#4FA393"],
+  "化学": ["#7B5EA7", "#9E86C9"],
+  "语文": ["#B4616E", "#D08C96"],
+  "英语": ["#3E7C4F", "#65A574"],
+  "思维": ["#C07A2D", "#DEA15C"]
+};
+function subjGradient(cat) {
+  const c = SUBJ_COLORS[cat] || ["#5B6472", "#7C8694"];
+  return "linear-gradient(150deg, " + c[0] + " 0%, " + c[1] + " 100%)";
+}
+function starsSVG(rorder, size) {
+  const s = size || 15;
+  let out = '<span class="poster-stars" aria-label="' + (rorder > 0 ? rorder + "星" : "不评级") + '">';
+  for (let i = 0; i < 5; i++) {
+    const on = i < rorder;
+    out += '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" aria-hidden="true">' +
+      '<path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3 1.1-6.5L2.6 9.3l6.5-.9L12 2.5z" fill="' +
+      (on ? "#E8A33D" : "#DDD8CB") + '"/></svg>';
+  }
+  return out + "</span>";
+}
+
+/* 海报位：统一使用渐变占位（海报通过"查看海报"按钮查看/下载） */
+function posterHTML(t, modal) {
+  if (modal) {
+    return '<div class="m-poster" style="background:' + subjGradient(t.cat) + '">' +
+      '<span class="m-poster-subj">' + esc(t.cat) + " · " + esc(t.subject) + "</span>" +
+      '<span class="m-poster-stage">' + (t.stage ? esc(t.stage) : esc(t.name)) + "</span>" +
+      starsSVG(t.rorder, 20) +
+      '<span class="m-poster-note">' + (t.poster ? "点击下方按钮查看海报" : "海报待补充") + "</span>" +
+    "</div>";
+  }
+  return '<div class="poster" style="background:' + subjGradient(t.cat) + '">' +
+    '<span class="poster-subj">' + esc(t.cat) + "</span>" +
+    '<span class="poster-stage">' + (t.stage ? esc(t.stage) : esc(t.name)) + "</span>" +
+    starsSVG(t.rorder) +
+    '<span class="poster-note">' + (t.poster ? "查看海报" : "海报待补充") + "</span>" +
+  "</div>";
+}
+
+/* ============ 家长需求匹配 ============ */
+const NEED_TAGS = [
+  { label: "基础薄弱", kw: ["基础薄弱", "基础差", "补基础", "跟不上"] },
+  { label: "成绩拔高", kw: ["拔高", "培优", "提分", "冲刺", "成绩好"] },
+  { label: "活泼好动", kw: ["活泼", "好动", "调皮", "坐不住"] },
+  { label: "内向安静", kw: ["内向", "安静", "腼腆", "不爱说话"] },
+  { label: "注意力不集中", kw: ["注意力", "走神", "不专注", "分心"] },
+  { label: "耐心细致", kw: ["耐心", "细致", "温柔", "亲和", "循循善诱"] },
+  { label: "严格负责", kw: ["严格", "负责", "严厉", "要求高"] },
+  { label: "幽默生动", kw: ["幽默", "生动", "有趣", "活跃"] },
+  { label: "经验丰富", kw: ["经验丰富", "资深", "多年", "名师"] },
+  { label: "高学历", kw: ["高学历", "学历"] }
+];
+
+/* 自由输入 → 关键词片段（去掉常见虚词后的二字组合） */
+function buildMatchKw(text) {
+  const stop = "希望孩子老师我家比较一点需要想要特别非常情况要求这个这些我们你们他们喜欢找位给报班想";
+  const clean = String(text || "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, "");
+  const grams = [];
+  for (let i = 0; i < clean.length - 1; i++) {
+    const g = clean.slice(i, i + 2);
+    if (stop.indexOf(g) === -1 && grams.indexOf(g) === -1) grams.push(g);
+  }
+  return grams;
+}
+
+/*
+ * 匹配计算：
+ * - 有「老师风格/匹配学生」数据时，按字段文本命中计算（高匹配/中匹配）
+ * - 无数据时降级：按输入片段搜索现有资料（学科/姓名/艺名/星级/备注），标记为初步匹配
+ */
+function teacherMatch(t, kws) {
+  const style = (t.style || "").toLowerCase();
+  const high = (t.match_high || "").toLowerCase();
+  const mid = (t.match_mid || "").toLowerCase();
+  const hasData = !!(style || high || mid);
+  if (hasData) {
+    let score = 0, hitHigh = false, hitMid = false;
+    kws.forEach(function (k) {
+      if (high.indexOf(k) !== -1 || style.indexOf(k) !== -1) { score += 2; hitHigh = true; }
+      else if (mid.indexOf(k) !== -1) { score += 1; hitMid = true; }
+    });
+    return { matched: score > 0, score: score, level: hitHigh ? "high" : (hitMid ? "mid" : null), hasData: true };
+  }
+  const hay = (t.name + " " + t.stage + " " + t.subject + " " + t.cat + " " + t.rating + " " + (t.remark || "")).toLowerCase();
+  const hits = kws.filter(function (k) { return hay.indexOf(k) !== -1; }).length;
+  return { matched: hits > 0, score: hits, level: hits > 0 ? "basic" : null, hasData: false };
+}
+
+/* 匹配条件字符串 → 标签列表：仅当所有逗号分段都是已知标签时返回标签列表，否则 null（自由输入） */
+function rawToTags(raw) {
+  if (!raw) return null;
+  const parts = raw.split(",").map(function (s) { return s.trim(); }).filter(Boolean);
+  if (!parts.length) return null;
+  const allValid = parts.every(function (p) { return NEED_TAGS.some(function (x) { return x.label === p; }); });
+  return allValid ? parts : null;
+}
+
+function matchRawToKw(raw) {
+  if (!raw) return null;
+  const tags = rawToTags(raw);
+  if (tags) {
+    const kws = [];
+    tags.forEach(function (label) {
+      const tag = NEED_TAGS.find(function (x) { return x.label === label; });
+      if (tag) tag.kw.forEach(function (k) { if (kws.indexOf(k) === -1) kws.push(k); });
+    });
+    return kws.length ? kws : null;
+  }
+  const kws = buildMatchKw(raw);
+  return kws.length ? kws : null;
+}
+
+const MIN_MATCH_TAGS = 2;
+
+/* ============ 状态 ============ */
+const state = { q: "", subj: "", star: "", cert: "", sort: "starDesc", matchRaw: "", pickedTags: [] };
+let suppressHash = false;
+
+function readHash() {
+  const h = location.hash || "";
+  if (h.startsWith("#detail")) return;
+  const p = new URLSearchParams(h.replace(/^#\/?\??/, ""));
+  state.q = p.get("kw") || "";
+  state.subj = p.get("subj") || "";
+  state.star = p.get("star") || "";
+  state.cert = p.get("cert") || "";
+  const s = p.get("sort");
+  if (s) state.sort = s;
+  state.matchRaw = p.get("match") || "";
+}
+function writeHash() {
+  if (suppressHash) return;
+  const p = new URLSearchParams();
+  if (state.q) p.set("kw", state.q);
+  if (state.subj) p.set("subj", state.subj);
+  if (state.star) p.set("star", state.star);
+  if (state.cert) p.set("cert", state.cert);
+  if (state.sort !== "starDesc") p.set("sort", state.sort);
+  if (state.matchRaw) p.set("match", state.matchRaw);
+  const q = p.toString();
+  const target = q ? "#/?" + q : "#/";
+  if (location.hash !== target) {
+    suppressHash = true;
+    location.hash = target;
+    suppressHash = false;
+  }
+}
+
+/* ============ 渲染 ============ */
+function filtered() {
+  const kw = state.q.trim().toLowerCase();
+  const mKws = matchRawToKw(state.matchRaw);
+  let list = TEACHERS.filter(function (t) {
+    if (state.subj && t.cat !== state.subj) return false;
+    if (state.star && t.rating !== state.star) return false;
+    if (state.cert && t.cert !== state.cert) return false;
+    if (kw) {
+      const hay = (t.name + " " + t.stage + " " + t.subject + " " + t.cat + " " + t.rating + " " + (t.remark || "")).toLowerCase();
+      if (hay.indexOf(kw) === -1) return false;
+    }
+    if (mKws && !teacherMatch(t, mKws).matched) return false;
+    return true;
+  });
+  if (mKws) {
+    list = list.map(function (t) { return { t: t, m: teacherMatch(t, mKws) }; })
+      .sort(function (a, b) {
+        const lv = function (m) { return m.level === "high" ? 3 : (m.level === "mid" ? 2 : (m.level === "basic" ? 1 : 0)); };
+        if (lv(a.m) !== lv(b.m)) return lv(b.m) - lv(a.m);
+        if (b.m.score !== a.m.score) return b.m.score - a.m.score;
+        return b.t.rorder - a.t.rorder || a.t.name.localeCompare(b.t.name, "zh");
+      })
+      .map(function (x) { return x.t; });
+  } else {
+    list.sort(function (a, b) {
+      if (state.sort === "starAsc") return a.rorder - b.rorder || a.name.localeCompare(b.name, "zh");
+      if (state.sort === "name") return a.name.localeCompare(b.name, "zh");
+      return b.rorder - a.rorder || a.name.localeCompare(b.name, "zh");
+    });
+  }
+  return list;
+}
+
+function cardHTML(t, mi) {
+  const certBadge = !t.cert
+    ? ""
+    : t.cert === "是"
+      ? '<span class="badge badge-cert">有教资</span>'
+      : '<span class="badge badge-nocert">无教资</span>';
+  const remarkBadge = t.remark
+    ? '<span class="badge badge-remark">' + esc(t.remark) + "</span>"
+    : "";
+  let matchBadge = "";
+  if (mi && mi.level === "high") matchBadge = '<span class="badge badge-match badge-match-high">高匹配</span>';
+  else if (mi && mi.level === "mid") matchBadge = '<span class="badge badge-match badge-match-mid">中匹配</span>';
+  else if (mi && mi.level === "basic") matchBadge = '<span class="badge badge-match badge-match-basic">初步匹配</span>';
+  let priceRows = "";
+  if (t.fee49_face !== null || t.fee49_online !== null) {
+    const f = t.fee49_face !== null ? yen(t.fee49_face) : '<span class="muted">—</span>';
+    const o = t.fee49_online !== null ? yen(t.fee49_online) : '<span class="muted">—</span>';
+    priceRows += '<div class="price-row sub"><span class="price-label">4-9年级（面授/线上）</span><span class="price-val">' + f + " / " + o + "</span></div>";
+  } else {
+    priceRows = '<div class="price-row"><span class="price-label">4-9年级收费</span><span class="price-val">待补充</span></div>';
+  }
+
+  return (
+    '<article class="card" tabindex="0" role="button" data-id="' + t.id + '" aria-label="查看 ' + esc(t.name) + " 的完整档案\">" +
+      posterHTML(t, false) +
+      '<div class="card-body">' +
+        '<div class="card-name-row"><span class="card-name">' + esc(t.name) + "</span>" +
+        (t.stage && t.stage !== t.name ? '<span class="card-stage">' + esc(t.stage) + "</span>" : "") + "</div>" +
+        '<div class="badge-row">' +
+          matchBadge +
+          '<span class="badge badge-subj" style="background:' + (SUBJ_COLORS[t.cat] ? SUBJ_COLORS[t.cat][0] : "#5B6472") + '">' + esc(t.cat) + "</span>" +
+          '<span class="badge badge-star">' + esc(t.rating) + "</span>" +
+          certBadge + remarkBadge +
+        "</div>" +
+        '<div class="price-block">' + priceRows + "</div>" +
+      "</div>" +
+      '<div class="card-foot">' +
+        (t.poster ? '<span class="poster-link" data-poster="' + t.id + '" role="button" tabindex="0" aria-label="查看 ' + esc(t.name) + ' 海报">查看海报</span>' : "") +
+        '<span class="view-detail">查看完整档案' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+        "</span>" +
+      "</div>" +
+    "</article>"
+  );
+}
+
+function renderGrid() {
+  const mKws = matchRawToKw(state.matchRaw);
+  const list = filtered();
+  const hintEl = document.getElementById("resultHint");
+  if (mKws) {
+    const hasData = list.some(function (t) { return !!(t.style || t.match_high || t.match_mid); });
+    document.getElementById("resultText").innerHTML = "按您的需求匹配到 <b>" + list.length + "</b> 位老师";
+    hintEl.textContent = hasData
+      ? "高匹配优先，点击卡片查看完整档案"
+      : "初步匹配：老师风格与匹配学生数据待补充，当前依据学科、星级、教资、备注等资料推荐";
+  } else {
+    document.getElementById("resultText").innerHTML = "<b>" + list.length + "</b> 位教师";
+    hintEl.textContent = "点击卡片查看完整档案";
+  }
+  const grid = document.getElementById("grid");
+  const empty = document.getElementById("empty");
+  if (!list.length) {
+    grid.innerHTML = "";
+    empty.hidden = false;
+    return;
+  }
+  empty.hidden = true;
+  grid.innerHTML = list.map(function (t) {
+    const mi = mKws ? teacherMatch(t, mKws) : null;
+    return cardHTML(t, mi);
+  }).join("");
+}
+
+/* ============ 详情 ============ */
+function feeRow(label, val) {
+  const v = (val === null || val === undefined)
+    ? '<span class="muted">—</span>'
+    : '<span class="yen">¥</span>' + val;
+  return "<tr><td>" + label + "</td><td class=\"num\">" + v + "</td></tr>";
+}
+function pend(v) {
+  return v ? esc(v) : '<span class="pend">待补充</span>';
+}
+
+/* ============ 老师风格 / 匹配学生：模块化展示 ============ */
+function splitItems(text) {
+  return String(text || "").split(/[；;。]/).map(function (s) { return s.trim(); }).filter(Boolean);
+}
+function itemsHTML(text) {
+  const items = splitItems(text);
+  if (!items.length) return "";
+  return '<ul class="m-list">' + items.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>";
+}
+function styleBlocks(style) {
+  if (!style) return null;
+  const marks = ["主要优势", "潜在风险提示", "适配建议"];
+  const blocks = [];
+  let pos = 0;
+  while (pos < style.length) {
+    let found = null;
+    marks.forEach(function (m) {
+      const i = style.indexOf(m, pos);
+      if (i >= 0 && (found === null || i < found.i)) found = { kw: m, i: i };
+    });
+    if (!found) {
+      const tail = style.slice(pos).trim();
+      if (tail) blocks.push({ title: null, text: tail });
+      break;
+    }
+    const head = style.slice(pos, found.i).trim();
+    if (head) blocks.push({ title: null, text: head });
+    const start = found.i;
+    let nxt = null;
+    marks.forEach(function (m) {
+      const j = style.indexOf(m, start + found.kw.length);
+      if (j >= 0 && (nxt === null || j < nxt)) nxt = j;
+    });
+    const segEnd = nxt === null ? style.length : nxt;
+    let seg = style.slice(start, segEnd).trim();
+    seg = seg.replace(new RegExp("^" + found.kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "[:：]?"), "").trim();
+    if (seg) blocks.push({ title: found.kw, text: seg });
+    pos = segEnd;
+  }
+  if (blocks.length && !blocks[0].title) blocks[0].title = "教学风格";
+  return blocks;
+}
+function styleHTML(style) {
+  const blocks = styleBlocks(style);
+  if (!blocks) return '<span class="pend">待补充</span>';
+  return blocks.map(function (b) {
+    return '<div class="m-sub-block">' +
+      '<span class="m-sub-title">' + esc(b.title) + "</span>" +
+      itemsHTML(b.text) +
+      "</div>";
+  }).join("");
+}
+function matchHTML(high, mid) {
+  if (!high && !mid) return '<span class="pend">待补充</span>';
+  let out = "";
+  if (high) out += '<div class="m-sub-block match-high"><span class="m-sub-title">高匹配学生</span>' + itemsHTML(high) + "</div>";
+  if (mid) out += '<div class="m-sub-block match-mid"><span class="m-sub-title">中匹配学生</span>' + itemsHTML(mid) + "</div>";
+  return out;
+}
+
+function openDetail(id) {
+  const t = TEACHERS.find(function (x) { return x.id === id; });
+  if (!t) return;
+  const certText = !t.cert ? '<span class="pend">待补充</span>' : (t.cert === "是" ? "有教资" : "无教资");
+  const certBadge = !t.cert ? "" : (t.cert === "是"
+    ? '<span class="badge badge-cert">有教资</span>'
+    : '<span class="badge badge-nocert">无教资</span>');
+  const remarkBadge = t.remark ? '<span class="badge badge-remark">' + esc(t.remark) + "</span>" : "";
+
+  const has49 = t.fee49_face !== null || t.fee49_online !== null;
+
+  let feeHTML = '<table class="fee-table"><tbody>';
+  feeHTML += "<tr><th>收费项目</th><th class=\"num\">价格（元/课时）</th></tr>";
+  if (has49) {
+    feeHTML += feeRow("4-9年级 · 面授", t.fee49_face);
+    feeHTML += feeRow("4-9年级 · 线上", t.fee49_online);
+  } else {
+    feeHTML += "<tr><td class=\"muted\">4-9年级收费标准</td><td class=\"num muted\">待补充</td></tr>";
+  }
+  feeHTML += "</tbody></table>";
+
+  document.getElementById("modalBody").innerHTML =
+    posterHTML(t, true) +
+    '<div class="m-body">' +
+      '<div class="m-head"><span class="m-name" id="mName">' + esc(t.name) + "</span>" +
+        (t.stage && t.stage !== t.name ? '<span class="m-stage">' + esc(t.stage) + "</span>" : "") + "</div>" +
+      '<div class="m-badges">' +
+        '<span class="badge badge-subj" style="background:' + (SUBJ_COLORS[t.cat] ? SUBJ_COLORS[t.cat][0] : "#5B6472") + '">' + esc(t.cat) + "</span>" +
+        '<span class="badge badge-star">' + esc(t.rating) + "</span>" +
+        certBadge + remarkBadge +
+      "</div>" +
+      (t.poster ? '<div class="m-poster-btn-row"><button type="button" class="poster-btn" data-poster="' + t.id + '">查看老师海报</button></div>' : "") +
+      '<div class="m-section"><h4>基础信息</h4><dl class="kv">' +
+        "<dt>姓名</dt><dd>" + esc(t.name) + "</dd>" +
+        "<dt>艺名</dt><dd>" + (t.stage ? esc(t.stage) : '<span class="pend">待补充</span>') + "</dd>" +
+        "<dt>学科</dt><dd>" + esc(t.subject) + "</dd>" +
+        "<dt>星级</dt><dd>" + esc(t.rating) + "</dd>" +
+        "<dt>教资</dt><dd>" + certText + "</dd>" +
+        "<dt>备注</dt><dd>" + (t.remark ? esc(t.remark) : '<span class="pend">无</span>') + "</dd>" +
+      "</dl></div>" +
+      '<div class="m-section"><h4>联系方式</h4><dl class="kv"><dt>联系方式</dt><dd>' + pend(t.contact) + "</dd></dl></div>" +
+      '<div class="m-section"><h4>老师风格</h4>' + styleHTML(t.style) + "</div>" +
+      '<div class="m-section"><h4>匹配学生</h4>' + matchHTML(t.match_high, t.match_mid) + "</div>" +
+      '<div class="m-section"><h4>老师价格</h4>' + feeHTML + "</div>" +
+      '<div class="m-note">价格数据来源：（4-9年级）星级老师收费标准（元/课时）。联系方式、海报、风格、匹配学生等信息待补充，更新数据后自动展示。</div>' +
+    "</div>";
+
+  document.getElementById("modal").hidden = false;
+  document.body.style.overflow = "hidden";
+  suppressHash = true;
+  location.hash = "#detail?id=" + id;
+  suppressHash = false;
+}
+function closeDetail() {
+  document.getElementById("modal").hidden = true;
+  document.body.style.overflow = "";
+  suppressHash = true;
+  writeHash();
+  suppressHash = false;
+}
+
+/* ============ 事件 ============ */
+document.getElementById("grid").addEventListener("click", function (e) {
+  const pl = e.target.closest(".poster-link");
+  if (pl) {
+    e.preventDefault();
+    openPoster(parseInt(pl.dataset.poster, 10));
+    return;
+  }
+  const card = e.target.closest(".card");
+  if (card) openDetail(parseInt(card.dataset.id, 10));
+});
+document.getElementById("grid").addEventListener("keydown", function (e) {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const pl = e.target.closest(".poster-link");
+  if (pl) {
+    e.preventDefault();
+    openPoster(parseInt(pl.dataset.poster, 10));
+    return;
+  }
+  const card = e.target.closest(".card");
+  if (card) {
+    e.preventDefault();
+    openDetail(parseInt(card.dataset.id, 10));
+  }
+});
+document.getElementById("modalClose").addEventListener("click", closeDetail);
+document.getElementById("modalBackdrop").addEventListener("click", closeDetail);
+document.getElementById("modalBody").addEventListener("click", function (e) {
+  const pb = e.target.closest(".poster-btn");
+  if (pb) openPoster(parseInt(pb.dataset.poster, 10));
+});
+document.addEventListener("keydown", function (e) {
+  if (e.key !== "Escape") return;
+  if (!document.getElementById("posterLightbox").hidden) closePoster();
+  else if (!document.getElementById("modal").hidden) closeDetail();
+});
+
+/* ============ 海报大图查看与下载 ============ */
+let currentPoster = { posters: [], index: 0, name: "" };
+function openPoster(id) {
+  const t = TEACHERS.find(function (x) { return x.id === id; });
+  if (!t || !t.poster) return;
+  const posters = Array.isArray(t.poster) ? t.poster : [t.poster];
+  currentPoster = { posters: posters, index: 0, name: (t.stage || t.name) + "_海报" };
+  renderPoster();
+  document.getElementById("posterLightbox").hidden = false;
+  document.body.style.overflow = "hidden";
+}
+function renderPoster() {
+  document.getElementById("posterLightboxImg").src = currentPoster.posters[currentPoster.index];
+  document.getElementById("posterLightboxName").textContent = currentPoster.name.replace("_海报", "");
+  const multi = currentPoster.posters.length > 1;
+  document.getElementById("posterPrevBtn").hidden = !multi;
+  document.getElementById("posterNextBtn").hidden = !multi;
+  const counter = document.getElementById("posterCounter");
+  counter.hidden = !multi;
+  if (multi) counter.textContent = (currentPoster.index + 1) + " / " + currentPoster.posters.length;
+}
+function switchPoster(delta) {
+  const n = currentPoster.posters.length;
+  if (n <= 1) return;
+  currentPoster.index = (currentPoster.index + delta + n) % n;
+  renderPoster();
+}
+function closePoster() {
+  document.getElementById("posterLightbox").hidden = true;
+  if (document.getElementById("modal").hidden) document.body.style.overflow = "";
+}
+function downloadPoster() {
+  const url = currentPoster.posters[currentPoster.index];
+  const suffix = currentPoster.posters.length > 1 ? ("_" + (currentPoster.index + 1)) : "";
+  const name = currentPoster.name + suffix + ".jpg";
+  fetch(url).then(function (r) {
+    if (!r.ok) throw new Error("fetch failed");
+    return r.blob();
+  }).then(function (b) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(b);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+  }).catch(function () {
+    window.open(url, "_blank");
+  });
+}
+document.getElementById("posterLightboxClose").addEventListener("click", closePoster);
+document.getElementById("posterLightboxBackdrop").addEventListener("click", closePoster);
+document.getElementById("posterDlBtn").addEventListener("click", downloadPoster);
+document.getElementById("posterPrevBtn").addEventListener("click", function () { switchPoster(-1); });
+document.getElementById("posterNextBtn").addEventListener("click", function () { switchPoster(1); });
+
+function syncUI() {
+  document.getElementById("searchInput").value = state.q;
+  document.getElementById("fSubj").value = state.subj;
+  document.getElementById("fStar").value = state.star;
+  document.getElementById("fCert").value = state.cert;
+  document.getElementById("fSort").value = state.sort;
+  document.getElementById("matchInput").value = state.matchRaw;
+  const tags = rawToTags(state.matchRaw);
+  state.pickedTags = tags ? tags.slice() : [];
+  renderChips();
+  syncMatchStatus();
+}
+
+/* ============ 家长需求匹配交互 ============ */
+function renderChips() {
+  const box = document.getElementById("matchChips");
+  box.innerHTML = NEED_TAGS.map(function (tag, i) {
+    const on = state.pickedTags.indexOf(tag.label) !== -1 ? " on" : "";
+    return '<button type="button" class="chip' + on + '" data-i="' + i + '">' + esc(tag.label) + "</button>";
+  }).join("");
+}
+function syncMatchStatus() {
+  const box = document.getElementById("matchStatus");
+  if (!state.matchRaw) {
+    if (state.pickedTags.length > 0 && state.pickedTags.length < MIN_MATCH_TAGS) {
+      box.innerHTML = "已选 <b>" + esc(state.pickedTags.join("、")) + "</b>，请<b>至少选择 2 个</b>需求标签（当前未应用）。";
+      box.hidden = false;
+    } else {
+      box.hidden = true;
+    }
+    return;
+  }
+  const tags = rawToTags(state.matchRaw);
+  const hasData = TEACHERS.some(function (t) { return !!(t.style || t.match_high || t.match_mid); });
+  const cond = tags
+    ? "当前匹配（" + tags.length + " 项）：<b>" + esc(tags.join("、")) + "</b>"
+    : "当前匹配条件：<b>" + esc(state.matchRaw) + "</b>";
+  box.innerHTML = cond +
+    (hasData ? "" : "（老师风格、匹配学生数据待补充，当前结果为依据学科/星级/教资等资料的<b>初步匹配</b>）") +
+    '<button type="button" class="clear-match" id="btnClearMatch">清除匹配</button>';
+  box.hidden = false;
+}
+function activateMatch(raw) {
+  state.matchRaw = raw || "";
+  writeHash();
+  renderGrid();
+  syncUI();
+}
+function runMatch() {
+  const text = document.getElementById("matchInput").value.trim();
+  if (text) { activateMatch(text); return; }
+  if (state.pickedTags.length >= MIN_MATCH_TAGS) {
+    activateMatch(state.pickedTags.join(","));
+    return;
+  }
+  const box = document.getElementById("matchStatus");
+  box.innerHTML = "请<b>至少选择 2 个</b>需求标签（当前已选 " + state.pickedTags.length + " 项），或在上方输入您的需求描述。";
+  box.hidden = false;
+  document.getElementById("matchInput").focus();
+}
+document.getElementById("matchBtn").addEventListener("click", runMatch);
+document.getElementById("matchInput").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") { e.preventDefault(); runMatch(); }
+});
+document.getElementById("matchInput").addEventListener("input", function (e) {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(function () {
+    const text = e.target.value.trim();
+    if (text) {
+      activateMatch(text);
+    } else if (state.pickedTags.length >= MIN_MATCH_TAGS) {
+      activateMatch(state.pickedTags.join(","));
+    } else {
+      activateMatch("");
+    }
+  }, 150);
+});
+document.getElementById("matchChips").addEventListener("click", function (e) {
+  const chip = e.target.closest(".chip");
+  if (!chip) return;
+  const tag = NEED_TAGS[parseInt(chip.dataset.i, 10)];
+  if (!tag) return;
+  const idx = state.pickedTags.indexOf(tag.label);
+  if (idx === -1) state.pickedTags.push(tag.label);
+  else state.pickedTags.splice(idx, 1);
+  renderChips();
+  if (state.pickedTags.length >= MIN_MATCH_TAGS) {
+    activateMatch(state.pickedTags.join(","));
+  } else if (state.pickedTags.length === 0 && rawToTags(state.matchRaw)) {
+    activateMatch("");
+  } else {
+    syncMatchStatus();
+  }
+});
+document.getElementById("matchStatus").addEventListener("click", function (e) {
+  if (e.target.id === "btnClearMatch") activateMatch("");
+});
+
+let debounceTimer = null;
+document.getElementById("searchInput").addEventListener("input", function (e) {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(function () {
+    state.q = e.target.value;
+    writeHash();
+    renderGrid();
+  }, 150);
+});
+document.getElementById("fSubj").addEventListener("change", function (e) { state.subj = e.target.value; writeHash(); renderGrid(); });
+document.getElementById("fStar").addEventListener("change", function (e) { state.star = e.target.value; writeHash(); renderGrid(); });
+document.getElementById("fCert").addEventListener("change", function (e) { state.cert = e.target.value; writeHash(); renderGrid(); });
+document.getElementById("fSort").addEventListener("change", function (e) { state.sort = e.target.value; writeHash(); renderGrid(); });
+document.getElementById("btnReset").addEventListener("click", resetAll);
+document.getElementById("btnClear2").addEventListener("click", resetAll);
+function resetAll() {
+  state.q = ""; state.subj = ""; state.star = ""; state.cert = ""; state.sort = "starDesc"; state.matchRaw = ""; state.pickedTags = [];
+  syncUI(); writeHash(); renderGrid();
+  document.getElementById("searchInput").focus();
+}
+
+window.addEventListener("hashchange", function () {
+  if (suppressHash) return;
+  if (location.hash.startsWith("#detail")) {
+    const m = location.hash.match(/id=(\d+)/);
+    if (m) openDetail(parseInt(m[1], 10));
+    return;
+  }
+  if (!document.getElementById("modal").hidden) {
+    document.getElementById("modal").hidden = true;
+    document.body.style.overflow = "";
+  }
+  readHash();
+  syncUI();
+  renderGrid();
+});
+
+/* ============ 启动 ============ */
+readHash();
+if (location.hash.startsWith("#detail")) {
+  const m = location.hash.match(/id=(\d+)/);
+  if (m) openDetail(parseInt(m[1], 10));
+} else {
+  syncUI();
+  renderGrid();
+}
+</script>
+</body>
+</html>
