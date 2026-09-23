@@ -262,6 +262,13 @@
     padding: 1px 9px;
   }
   .poster-stars { display: flex; gap: 3px; }
+  .poster-stars.no-rate {
+    display: inline-flex; align-items: center;
+    font-size: 12px; letter-spacing: .18em;
+    color: rgba(255,255,255,.92);
+    border: 1px solid rgba(255,255,255,.5);
+    border-radius: 999px; padding: 1px 12px;
+  }
 
   .card-body { padding: 14px 16px 0; display: flex; flex-direction: column; gap: 10px; flex: 1; }
   .card-name-row { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
@@ -718,13 +725,14 @@ function subjGradient(cat) {
   return "linear-gradient(150deg, " + c[0] + " 0%, " + c[1] + " 100%)";
 }
 function starsSVG(rorder, size) {
+  if (!rorder || rorder <= 0) {
+    return '<span class="poster-stars no-rate">不评级</span>';
+  }
   const s = size || 15;
-  let out = '<span class="poster-stars" aria-label="' + (rorder > 0 ? rorder + "星" : "不评级") + '">';
-  for (let i = 0; i < 5; i++) {
-    const on = i < rorder;
+  let out = '<span class="poster-stars" aria-label="' + rorder + '星">';
+  for (let i = 0; i < rorder; i++) {
     out += '<svg width="' + s + '" height="' + s + '" viewBox="0 0 24 24" aria-hidden="true">' +
-      '<path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3 1.1-6.5L2.6 9.3l6.5-.9L12 2.5z" fill="' +
-      (on ? "#E8A33D" : "#DDD8CB") + '"/></svg>';
+      '<path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3 1.1-6.5L2.6 9.3l6.5-.9L12 2.5z" fill="#E8A33D"/></svg>';
   }
   return out + "</span>";
 }
