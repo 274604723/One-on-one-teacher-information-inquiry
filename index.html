@@ -749,7 +749,7 @@ function posterHTML(t, modal) {
     "</div>";
   }
   return '<div class="poster" style="background:' + subjGradient(t.cat) + '">' +
-    '<span class="poster-subj">' + esc(t.cat) + "</span>" +
+    '<span class="poster-subj">' + esc(t.subject || t.cat) + "</span>" +
     '<span class="poster-stage">' + (t.stage ? esc(t.stage) : esc(t.name)) + "</span>" +
     starsSVG(t.rorder) +
     '<span class="poster-note">' + (t.poster ? "查看海报" : "海报待补充") + "</span>" +
